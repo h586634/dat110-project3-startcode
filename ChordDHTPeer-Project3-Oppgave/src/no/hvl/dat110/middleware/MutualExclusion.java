@@ -173,6 +173,8 @@ public class MutualExclusion {
 				// if clocks are the same, compare nodeIDs, the lowest wins
 				boolean sendersTiebreaker = senderClock == ownClock && node.getNodeID().compareTo(message.getNodeID()) > 0;
 				
+				System.out.println("Sender clock = " + senderClock + "	Own clock = " + ownClock + "	Sender's id is smallest = " + sendersTiebreaker);
+				
 				// if sender wins, acknowledge the message, obtain a stub and call onMutexAcknowledgementReceived()
 				if((senderClock < ownClock) || sendersTiebreaker) {
 					message.setAcknowledged(true);
