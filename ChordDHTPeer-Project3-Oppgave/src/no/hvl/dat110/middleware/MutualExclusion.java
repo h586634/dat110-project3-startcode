@@ -145,8 +145,10 @@ public class MutualExclusion {
 			case 0: {
 				// get a stub for the sender from the registry
 				NodeInterface stub = Util.getProcessStub(procName, port);
+				
 				// acknowledge message
 				message.setAcknowledged(true);
+				
 				// send acknowledgement back by calling onMutexAcknowledgementReceived()
 				stub.onMutexAcknowledgementReceived(message);
 				break;
@@ -171,7 +173,7 @@ public class MutualExclusion {
 				
 				// compare clocks, the lowest wins
 				// if clocks are the same, compare nodeIDs, the lowest wins
-				boolean sendersTiebreaker = senderClock == ownClock && node.getNodeID().compareTo(message.getNodeID()) > 0;
+				boolean sendersTiebreaker = senderClock == ownClock && node.getNodeID().compareTo(message.getNodeID()) < 0;
 				
 				System.out.println("Sender clock = " + senderClock + "	Own clock = " + ownClock + "	Sender's id is smallest = " + sendersTiebreaker);
 				
