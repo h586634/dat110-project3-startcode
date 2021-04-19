@@ -58,11 +58,11 @@ public class FileManager {
 		for (int i = 0; i < numReplicas; i++) {
 			
 			// replicate by adding the index to filename
-			//String rep = filename + i;
+			String rep = filename + i;
 			
 			// hash the replica
 			// store the hash in the replicafiles array.
-			replicafiles[i] = Hash.hashOf(filename+i);
+			replicafiles[i] = Hash.hashOf(rep);
 		}
 	}
 	
