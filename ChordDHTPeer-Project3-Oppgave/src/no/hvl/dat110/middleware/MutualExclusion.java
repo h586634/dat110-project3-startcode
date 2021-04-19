@@ -101,7 +101,7 @@ public class MutualExclusion {
 			NodeInterface stub = Util.getProcessStub(msg.getNodeIP(), msg.getPort());
 		// call onMutexRequestReceived()	
 			stub.onMutexRequestReceived(msg);
-		}	
+		}
 	}
 	
 	public void onMutexRequestReceived(Message message) throws RemoteException {
@@ -117,15 +117,19 @@ public class MutualExclusion {
 				message.setAcknowledged(true);
 				onMutexAcknowledgementReceived(message);
 		} else {
-			if (!(WANTS_TO_ENTER_CS || CS_BUSY)) {	
-				// caseid=0: Receiver is not accessing shared resource and does not want to (send OK to sender)
+			// caseid=0: Receiver is not accessing shared resource and does not want to
+			if (!WANTS_TO_ENTER_CS && !CS_BUSY) {
 				caseid = 0;
-			} else if (CS_BUSY) {	
-				// caseid=1: Receiver already has access to the resource (dont reply but queue the request)
+			}
+			// caseid=1: Receiver already has access to the resource (dont reply but queue
+			// the request)
+			else if (CS_BUSY) {
 				caseid = 1;
-			} else {
-				// caseid=2: Receiver wants to access resource but is yet to - compare own message clock to received message's clock
-				caseid = 2;			
+			}
+			// caseid=2: Receiver wants to access resource but is yet to - compare own
+			// message clock to received message's clock
+			else if (WANTS_TO_ENTER_CS) {
+				caseid = 2;
 			}
 		}
 		
