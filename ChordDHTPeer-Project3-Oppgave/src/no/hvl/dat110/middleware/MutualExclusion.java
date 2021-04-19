@@ -117,15 +117,15 @@ public class MutualExclusion {
 				message.setAcknowledged(true);
 				onMutexAcknowledgementReceived(message);
 		} else {
-			if (!CS_BUSY && !WANTS_TO_ENTER_CS) {
+			if (!(WANTS_TO_ENTER_CS || CS_BUSY)) {	
 				// caseid=0: Receiver is not accessing shared resource and does not want to (send OK to sender)
 				caseid = 0;
-			} else if (CS_BUSY) {
+			} else if (CS_BUSY) {	
 				// caseid=1: Receiver already has access to the resource (dont reply but queue the request)
 				caseid = 1;
 			} else {
 				// caseid=2: Receiver wants to access resource but is yet to - compare own message clock to received message's clock
-				caseid = 2;
+				caseid = 2;			
 			}
 		}
 		
@@ -167,17 +167,17 @@ public class MutualExclusion {
 			 */
 			case 2: {
 				// check the clock of the sending process
-				// own clock for the multicast message
+				//NodeInterface stub = Util.getProcessStub(procName, port);
 				int senderClock = message.getClock();
+				
+				// own clock for the multicast message
 				int ownClock = clock.getClock();
 				
 				// compare clocks, the lowest wins
 				// if clocks are the same, compare nodeIDs, the lowest wins
-				boolean sendersTiebreaker = senderClock == ownClock && node.getNodeID().compareTo(message.getNodeID()) < 0;
-				
-				System.out.println("Sender clock = " + senderClock + "	Own clock = " + ownClock + "	Sender's id is smallest = " + sendersTiebreaker);
-				
-				// if sender wins, acknowledge the message, obtain a stub and call onMutexAcknowledgementReceived()
+				boolean sendersTiebreaker = (senderClock == ownClock) && (message.getNodeID().compareTo(node.getNodeID()) < 0);
+								
+				//if sender wins, acknowledge the message, obtain a stub and call onMutexAcknowledgementReceived()
 				if((senderClock < ownClock) || sendersTiebreaker) {
 					message.setAcknowledged(true);
 					NodeInterface stub = Util.getProcessStub(message.getNameOfFile(), message.getPort());
@@ -186,6 +186,22 @@ public class MutualExclusion {
 					// if sender looses, queue it
 					queue.add(message);
 				}
+				
+				/*if(senderClock < ownClock) {
+					message.setAcknowledged(true);
+					stub.onMutexAcknowledgementReceived(message);
+					
+				} else if (senderClock == ownClock) {
+					if(stub.getNodeID().compareTo(message.getNodeID()) < 0) {
+						message.setAcknowledged(true);
+						stub.onMutexAcknowledgementReceived(message);
+						
+					} else {
+						queue.add(message);
+					}
+				} else {
+					queue.add(message);
+				}*/
 
 				break;
 			}
@@ -206,13 +222,13 @@ public class MutualExclusion {
 		
 		// iterate over the activenodes
 		for(Message msg : activenodes ){
-
+			try {
 	// obtain a stub for each node from the registry
 		NodeInterface stub = Util.getProcessStub(msg.getNodeIP(), msg.getPort());
 
 	// call releaseLocks()	
 					
-		try {
+		
 			stub.releaseLocks();
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -223,17 +239,13 @@ public class MutualExclusion {
 	
 	private boolean areAllMessagesReturned(int numvoters) throws RemoteException {
 		// check if the size of the queueack is same as the numvoters
-
-		if(queueack.size() == numvoters){
-
-			// clear the queueack
-			queueack.clear();
-			return true; 
-		}
+		boolean check = queueack.size() == numvoters;
+		
+		// clear the queueack
+		queueack.clear();
 		
 		// return true if yes and false if no
-
-		return false;
+		return check;
 	}
 	
 	private List<Message> removeDuplicatePeersBeforeVoting() {
