@@ -19,19 +19,15 @@ public class Hash {
 	
 	public static BigInteger hashOf(String entity) {		
 		
-	
+		String resultat = " ";
 		try {
 			
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
 			byte [] md5HashBytes = md5.digest(entity.getBytes());
 			
-			md5.update(md5HashBytes);
-			
-			byte[] digest = md5.digest();
 
-			String resultat = toHex(digest);
+			resultat = toHex(md5HashBytes);
 			hashint = new BigInteger(resultat, 16);
-			
 		} catch(NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -41,37 +37,27 @@ public class Hash {
 	
 	public static BigInteger addressSize() {
 		
-		MessageDigest md; 
-		
 		try {
 			 
-			md = MessageDigest.getInstance("MD5");
-			int length = md.getDigestLength();
-			int numBit = length * 8; 
-			BigInteger svar = new BigInteger("2").pow(numBit);
-			return svar; 
+			int numberBits = bitSize();
+			double addSize = Math.pow(2, numberBits);
+			hashint = BigDecimal.valueOf(addSize).toBigInteger();
 			
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return hashint;
 	}
 	
-	public static int bitSize() {
+	public static int bitSize() throws NoSuchAlgorithmException {
 		
 		int digestlen = 0;
 		
-		MessageDigest md;
-		
-		try {
-				md = MessageDigest.getInstance("MD5");
-				digestlen = md.getDigestLength();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+		MessageDigest md5 = MessageDigest.getInstance("MD5");
+		digestlen = md5.getDigestLength();
 	
-		return digestlen * 8;
+		return digestlen*8;
 	}
 	
 	public static String toHex(byte[] digest) {
