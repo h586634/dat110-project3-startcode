@@ -7,7 +7,6 @@ package no.hvl.dat110.util;
  */
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -22,7 +21,7 @@ public class Hash {
 		try {
 			
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte [] messageDigest = md.digest(entity.getBytes());
+			byte[] messageDigest = md.digest(entity.getBytes());
 			String hex = toHex(messageDigest);
 			hashint = new BigInteger(hex, 16);
 			
