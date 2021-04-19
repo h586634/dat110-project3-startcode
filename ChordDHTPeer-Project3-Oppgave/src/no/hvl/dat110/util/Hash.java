@@ -37,15 +37,9 @@ public class Hash {
 	
 	public static BigInteger addressSize() {
 		
-		try {
-			 
-			int numberBits = bitSize();
-			double addSize = Math.pow(2, numberBits);
-			hashint = BigDecimal.valueOf(addSize).toBigInteger();
-			
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+		int numberBits = bitSize();
+		double addSize = Math.pow(2, numberBits);
+		hashint = BigDecimal.valueOf(addSize).toBigInteger();
 		
 		return hashint;
 	}
@@ -54,11 +48,16 @@ public class Hash {
 		
 		int digestlen = 0;
 		
-		MessageDigest md5 = MessageDigest.getInstance("MD5");
-		digestlen = md5.getDigestLength();
-	
-		return digestlen*8;
-	}
+		MessageDigest md;
+		
+		try {
+				md = MessageDigest.getInstance("MD5");
+				digestlen = md.getDigestLength();
+		} catch(NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return digestlen * 8;
+		}
 	
 	public static String toHex(byte[] digest) {
 		StringBuilder strbuilder = new StringBuilder();
