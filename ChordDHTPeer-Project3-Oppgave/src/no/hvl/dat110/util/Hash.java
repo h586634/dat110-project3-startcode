@@ -19,15 +19,13 @@ public class Hash {
 	
 	public static BigInteger hashOf(String entity) {		
 		
-		String resultat = " ";
 		try {
 			
-			MessageDigest md5 = MessageDigest.getInstance("MD5");
-			byte [] md5HashBytes = md5.digest(entity.getBytes());
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte [] messageDigest = md.digest(entity.getBytes());
+			String hex = toHex(messageDigest);
+			hashint = new BigInteger(hex, 16);
 			
-
-			resultat = toHex(md5HashBytes);
-			hashint = new BigInteger(resultat, 16);
 		} catch(NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -37,11 +35,18 @@ public class Hash {
 	
 	public static BigInteger addressSize() {
 		
-		int numberBits = bitSize();
-		double addSize = Math.pow(2, numberBits);
-		hashint = BigDecimal.valueOf(addSize).toBigInteger();
-		
-		return hashint;
+		try {
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				int length = md.getDigestLength();
+				int bits = length * 8;
+				BigInteger exp = new BigInteger("2");
+				exp = exp.pow(bits);
+				return exp;
+				
+		} catch(NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public static int bitSize() {
