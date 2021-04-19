@@ -6,8 +6,10 @@ package no.hvl.dat110.util;
  *
  */
 
-
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -21,10 +23,9 @@ public class Hash {
 		try {
 			
 			MessageDigest md5 = MessageDigest.getInstance("MD5");
+			byte [] md5HashBytes = md5.digest(entity.getBytes());
 			
-			byte [] entityBytes = entity.getBytes();
-			
-			md5.update(entityBytes);
+			md5.update(md5HashBytes);
 			
 			byte[] digest = md5.digest();
 
@@ -57,12 +58,18 @@ public class Hash {
 		return null;
 	}
 	
-	public static int bitSize() throws NoSuchAlgorithmException {
+	public static int bitSize() {
 		
 		int digestlen = 0;
 		
-		digestlen = MessageDigest.getInstance("MD5").getDigestLength();
+		MessageDigest md;
 		
+		try {
+				md = MessageDigest.getInstance("MD5");
+				digestlen = md.getDigestLength();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 	
 		return digestlen * 8;
 	}
